@@ -1,6 +1,8 @@
-import React, {ChangeEvent, KeyboardEvent, FC, useState} from 'react';
+import React, {Dispatch, FC, SetStateAction} from 'react';
 import {FilterValueType} from "./App";
 import {SuperButton} from "./components/SuperButton";
+import {Input} from "./components/Input";
+
 
 
 export type tasksPropsType = {
@@ -13,74 +15,48 @@ type TodoListPropsType = {
     title: string
     tasks: tasksPropsType[]
     removeTask:(id: string)=>void
-    changeFilter:(value: FilterValueType)=>void
-    addTask:(title: string)=>void
+    changeFilter:(filter: FilterValueType)=>void
+    addTask:()=>void
+    newTitle:string
+    setNewTitle:(Dispatch<SetStateAction<string>>)
 }
 
 
 
 export const TodoList: FC<TodoListPropsType> = (props) => {
 
-    const [title, setTitle] = useState("")
-
-    const addTaskHandler = () => {
-        props.addTask(title)
-        setTitle("")
-    }
-
-    const setLocalTitleHandler = (e: ChangeEvent<HTMLInputElement>) => setTitle(e.currentTarget.value)
 
 
-    const maxTitleLength = 20
-    const recommendedTitleLength = 5
-    const isAddTaskNotPossible: boolean = !title.length || title.length > maxTitleLength
-
-    const onKeyDownAddTaskHandler = isAddTaskNotPossible
-        ? undefined
-        : (e: KeyboardEvent<HTMLInputElement>) => e.key === "Enter" && addTaskHandler()
-
-    const longTimeWorning = title.length > recommendedTitleLength && <div style={{color: "hotpink"}}>Title should be shorter</div>
-    const longTitleErrorMessage = title.length > maxTitleLength && <div style={{color: "red"}}>Too long title</div>
 
 
     const todoListItems = props.tasks.map(t=>{
-
-        const removeTaskHandler = () => {
+        const onClickHandler = () => {
             props.removeTask(t.id)
         }
-
         return (
             <li><input type='checkbox' checked={t.isDone}/> <span>{t.title}</span>
-                <button onClick={removeTaskHandler}>x</button></li>
+                <button onClick={onClickHandler}>x</button></li>
         )})
-
-        // <SuperButton callBack={removeTaskHandler}/>
 
     return (
         <div>
             <div>
                 <h3>{props.title}</h3>
                 <div>
-                    <input value={title}
-                           onChange={setLocalTitleHandler}
-                           onKeyDown={onKeyDownAddTaskHandler}
-
+                    <Input newTitle={props.newTitle}
+                           setNewTitle={props.setNewTitle}
                     />
-                    <SuperButton callBack={addTaskHandler}
-                                 // disabled={isAddTaskNotPossible}
-                        name={"xx"}
-                    />
-
-                    {longTimeWorning}
-                    {longTitleErrorMessage}
+                    <span>
+                        <SuperButton callBack={props.addTask}/>
+                    </span>
                 </div>
                 <ul>
                     { todoListItems }
                 </ul>
                 <div>
-                    <button onClick={()=>{props.changeFilter("All")}}>All</button>
-                    <button onClick={()=>{props.changeFilter("Active")}}>Active</button>
-                    <button onClick={()=>{props.changeFilter("Completed")}}>Completed</button>
+                    <button onClick={()=>props.changeFilter("All")}>All</button>
+                    <button onClick={()=>props.changeFilter("Active")}>Active</button>
+                    <button onClick={()=>props.changeFilter("Complete")}>Completed</button>
                 </div>
             </div>
         </div>

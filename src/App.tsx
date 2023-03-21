@@ -2,9 +2,8 @@ import React, {useState} from 'react';
 import './App.css';
 import {tasksPropsType, TodoList} from "./TodoList";
 import {v1} from "uuid";
-import {SuperButton} from "./components/SuperButton";
 
-export type FilterValueType = "All" | "Completed" | "Active"
+export type FilterValueType = "All" | "Complete" | "Active"
 
 function App(){
 
@@ -19,26 +18,29 @@ function App(){
 
     let [filter, setFilter] = useState<FilterValueType>("All")
 
+    let [newTitle, setNewTitle] = useState("")
+
     const removeTask = (id: string) => {
-        setTasks(tasks.filter(t=>t.id!==id))
+        setTasks(tasks.filter(t=>t.id !== id))
     }
 
-   let tasksForTodoList = tasks
-    if (filter === "Active") tasksForTodoList = tasks.filter(t=> !t.isDone)
-    if (filter === "Completed") tasksForTodoList = tasks.filter(t=>t.isDone)
+    let filteredTasks = tasks
+    if(filter=== "Complete") filteredTasks = tasks.filter(t=>t.isDone)
+    if(filter=== "Active") filteredTasks = tasks.filter(t=>!t.isDone)
 
-    const changeFilter = (value: FilterValueType) => {
-        setFilter(value)
+
+    const changeFilter = (filter: FilterValueType) => {
+        setFilter(filter)
     }
 
-    const addTask = (title: string) => {
-        const newTask = {
-            id: v1(),
-            title: title,
-            isDone: true}
+    const addTask = () => {
+        let newTask =  {id: v1(),
+            title: newTitle,
+            isDone: true
+        }
         setTasks([newTask, ...tasks])
+        setNewTitle("")
     }
-
 
 
 
@@ -46,10 +48,12 @@ function App(){
     return (
         <div>
             <TodoList title={"What to buy"}
-                      tasks={tasksForTodoList}
+                      tasks={filteredTasks}
                       removeTask={removeTask}
                       changeFilter={changeFilter}
                       addTask={addTask}
+                      newTitle={newTitle}
+                      setNewTitle={setNewTitle}
             />
 
         </div>
